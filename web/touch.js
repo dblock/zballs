@@ -3,7 +3,37 @@
 // tap is a mouse move and a click, and sliding a finger moves the mouse. When
 // the finger lifts, the mouse moves to the top-left corner, where no ball can
 // go, so that it doesn't keep touching a ball.
+//
+// CheerpJ ignores touches on AWT buttons too, so taps on Restart ! and Sound !
+// are turned into mouse presses. Phones only allow sound after a tap, so every
+// tap resumes the audio that CheerpJ creates. This script must load before
+// CheerpJ to see its audio contexts.
 (function () {
+  var contexts = [];
+  ['AudioContext', 'webkitAudioContext'].forEach(function (name) {
+    var Original = window[name];
+    if (!Original) return;
+    var Wrapped = function () {
+      var ctx = new (Function.prototype.bind.apply(Original, [null].concat([].slice.call(arguments))))();
+      contexts.push(ctx);
+      return ctx;
+    };
+    Wrapped.prototype = Original.prototype;
+    window[name] = Wrapped;
+  });
+
+  // Play sound even when an iPhone's ring/silent switch is set to silent.
+  if (navigator.audioSession) navigator.audioSession.type = 'playback';
+
+  function unlockAudio() {
+    contexts.forEach(function (ctx) {
+      if (ctx.state !== 'running') ctx.resume();
+    });
+  }
+  ['touchend', 'click'].forEach(function (type) {
+    window.addEventListener(type, unlockAudio, true);
+  });
+
   function game(target) {
     return target instanceof Element && target.closest('.game');
   }
@@ -13,6 +43,7 @@
   }
 
   function send(type, target, x, y, buttons) {
+    if (!target) return;
     target.dispatchEvent(new PointerEvent(type, {
       bubbles: true,
       cancelable: true,
@@ -29,10 +60,17 @@
 
   function onPointer(e) {
     if (e.pointerType === 'mouse' || !game(e.target)) return;
-    // Let the Restart ! and Sound ! buttons handle their own taps.
-    if (e.target.tagName === 'INPUT') return;
     e.preventDefault();
     e.stopImmediatePropagation();
+    if (e.target.tagName === 'INPUT') {
+      if (e.type === 'pointerdown') {
+        send('pointermove', e.target, e.clientX, e.clientY, 0);
+        send('pointerdown', e.target, e.clientX, e.clientY, 1);
+      } else if (e.type === 'pointerup') {
+        send('pointerup', e.target, e.clientX, e.clientY, 0);
+      }
+      return;
+    }
     var target = canvas() || e.target;
     if (e.type === 'pointerdown') {
       send('pointermove', target, e.clientX, e.clientY, 0);
@@ -59,5 +97,4 @@
   }
   new MutationObserver(function () { noKeyboard(document); })
     .observe(document.documentElement, { childList: true, subtree: true });
-  noKeyboard(document);
 })();

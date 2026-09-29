@@ -26,16 +26,19 @@ Browsers no longer run Java applets, and the JDK no longer ships `appletviewer`.
 ./run.sh --original  # run the 1998 .class files as shipped
 ```
 
-This needs a JDK between 8 and 19.
+[build.sh](build.sh) copies the sources to `build/src` and fixes them before compiling.
 
-* JDK 20 and newer made `Thread.stop()` throw, and the game uses it for **Restart !**.
-* The applet API is deprecated for removal.
+* The sources have `import zInterract;`, a single-name import from the unnamed package. That has been illegal since Java 1.4, so these lines are removed.
+* [patches/01-restart-without-thread-stop.patch](patches/01-restart-without-thread-stop.patch): **Restart !** killed the game thread with `Thread.stop()`, which throws since JDK 20 and doesn't work in CheerpJ. The game thread now checks whether it was replaced and exits.
+* [patches/02-buttons-action-listeners.patch](patches/02-buttons-action-listeners.patch): **Restart !** and **Sound !** listened for mouse presses, which CheerpJ doesn't send to buttons. They now listen for button actions.
 
-The sources have `import zInterract;`, a single-name import from the unnamed package. That has been illegal since Java 1.4, so [build.sh](build.sh) strips these lines into `build/src` before compiling.
+The patched build needs JDK 8 to 25, because JDK 26 removed the Applet API. The original `.class` files need JDK 8 to 19 for **Restart !** to work.
 
 ## Playing Online
 
-[CheerpJ](https://cheerpj.com) runs Java applets in the browser. [web/index.html](web/index.html) embeds the 1998 `.class` files with a `<cheerpj-applet>` tag, and [publish.sh](publish.sh) copies it with the classes, images and sounds to the `gh-pages` branch.
+[CheerpJ](https://cheerpj.com) runs Java applets in the browser. [web/index.html](web/index.html) embeds the game with a `<cheerpj-applet>` tag, and [publish.sh](publish.sh) builds it and copies it with the images and sounds to the `gh-pages` branch.
+
+Phones need some help, in [web/touch.js](web/touch.js). The game is played by hovering the mouse, so touches become mouse moves, and taps on the buttons become clicks. It also stops CheerpJ from bringing up the keyboard and turns on sound after the first tap.
 
 ```sh
 ./publish.sh --push

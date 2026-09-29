@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
-# Publishes the game to the gh-pages branch, where CheerpJ runs the original
-# 1998 .class files in the browser. Pass --push to push the branch.
+# Publishes the game to the gh-pages branch, where CheerpJ runs it in the
+# browser. Pass --push to push the branch.
 set -euo pipefail
 cd "$(dirname "$0")"
+./build.sh
 site=$(mktemp -d)
 git worktree add -q --no-checkout "$site" 2>/dev/null || true
 trap 'git worktree remove --force "$site"' EXIT
@@ -13,7 +14,8 @@ else
 fi
 git -C "$site" rm -rq --cached --ignore-unmatch .
 find "$site" -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
-cp web/index.html web/touch.js ./*.class "$site/"
+cp web/index.html web/touch.js "$site/"
+cp build/classes/z*.class "$site/"
 cp -R images sounds "$site/"
 touch "$site/.nojekyll"
 git -C "$site" add -A
