@@ -1,0 +1,21 @@
+--- a/zballs.java
++++ b/zballs.java
+@@ -141,14 +141,14 @@
+       this.add(soundButton);
+       this.addMouseListener(this);
+       this.addMouseMotionListener(this);
+-      quitButton.addMouseListener(new MouseAdapter(){
+-	public void mousePressed(MouseEvent e){
++      quitButton.addActionListener(new ActionListener(){
++	public void actionPerformed(ActionEvent e){
+ 	  stop();
+ 	  start();
+ 	}
+       });
+-      soundButton.addMouseListener(new MouseAdapter(){
+-	public void mousePressed(MouseEvent e){
++      soundButton.addActionListener(new ActionListener(){
++	public void actionPerformed(ActionEvent e){
+ 	  soundEnabled=!soundEnabled;
+ 	  if (!soundEnabled){
+ 	    ballSound.stop();
