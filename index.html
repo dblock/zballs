@@ -8,7 +8,7 @@
     <script>cheerpjInit();</script>
     <style>
       body { font-family: sans-serif; background: white; color: #333; text-align: center; }
-      .game { display: inline-block; margin: 16px auto; width: 350px; height: 500px; }
+      .game { display: inline-block; margin: 16px auto; width: 350px; height: 500px; touch-action: none; -webkit-user-select: none; user-select: none; }
       p { max-width: 520px; margin: 8px auto; font-size: 14px; }
     </style>
   </head>
@@ -16,7 +16,7 @@
     <h1>Bolongas zBalls</h1>
     <p>
       A Java 1.1 applet from 1998, running in your browser with <a href="https://cheerpj.com">CheerpJ</a>.
-      Wait for it to load, then click to start.
+      Wait for it to load, then click to start. On a phone, tap to start and slide your finger around.
     </p>
     <p>
       Move the mouse over the dark ball to blow it up. Touching a plain ball spawns another one.
@@ -29,5 +29,6 @@
       &copy; 1998 Daniel Doubrovkine and Olivier Chekroun, University of Geneva.
       Source on <a href="https://github.com/dblock/zballs">GitHub</a>.
     </p>
+    <script src="touch.js"></script>
   </body>
 </html>
