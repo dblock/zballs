@@ -13,7 +13,7 @@ else
 fi
 git -C "$site" rm -rq --cached --ignore-unmatch .
 find "$site" -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
-cp web/index.html ./*.class "$site/"
+cp web/index.html web/touch.js ./*.class "$site/"
 cp -R images sounds "$site/"
 touch "$site/.nojekyll"
 git -C "$site" add -A
